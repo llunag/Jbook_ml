@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -63,6 +63,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'python_EDA';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Resultados" href="python_Modelos.html" />
     <link rel="prev" title="Proyecto de Machine Learning" href="intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -169,6 +170,7 @@
         </ul>
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Análisis exploratorio de datos (EDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python_Modelos.html">Resultados</a></li>
 </ul>
 
     </div>
@@ -428,6 +430,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.express</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">px</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">folium</span>
@@ -440,6 +443,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.graphics.tsaplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_pacf</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.tsa.stattools</span><span class="w"> </span><span class="kn">import</span> <span class="n">adfuller</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.tsa.stattools</span><span class="w"> </span><span class="kn">import</span> <span class="n">kpss</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.tsa.stattools</span><span class="w"> </span><span class="kn">import</span> <span class="n">ccf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">esda.moran</span><span class="w"> </span><span class="kn">import</span> <span class="n">Moran</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">libpysal.weights</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNN</span>
 </pre></div>
 </div>
 </div>
@@ -723,7 +729,7 @@ memory usage: 11.7 MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_15736\4232421614.py:3: UserWarning: To output multiple subplots, the figure containing the passed axes is being cleared.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_8952\4232421614.py:3: UserWarning: To output multiple subplots, the figure containing the passed axes is being cleared.
   data.iloc[:, 2:8].hist(ax=axes, bins=30, edgecolor=&#39;black&#39;, grid=False)
 </pre></div>
 </div>
@@ -788,15 +794,83 @@ memory usage: 11.7 MB
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Matriz de correlación</span>
+<span class="n">vars_numericas</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Hs&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;uo&#39;</span><span class="p">,</span> <span class="s1">&#39;vo&#39;</span><span class="p">,</span> <span class="s1">&#39;mwd&#39;</span><span class="p">]</span>
+<span class="n">corr_kendall</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">vars_numericas</span><span class="p">]</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;kendall&#39;</span><span class="p">)</span>
+
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;date_time&#39;</span><span class="p">,</span> <span class="s1">&#39;Start_Month&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">corr</span><span class="p">(),</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Reds&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Matriz de Correlación&#39;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr_kendall</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Reds&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Matriz de Correlación (Kendall)&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/22b2949997e165426132d26ba314b8386bb4fcd95db9ad869f8a8f0d73b3032b.png" src="_images/22b2949997e165426132d26ba314b8386bb4fcd95db9ad869f8a8f0d73b3032b.png" />
+<img alt="_images/56f105a5fcae416bda64470f1dc4a7513257e27f5f21d50f277fc9735f4826c8.png" src="_images/56f105a5fcae416bda64470f1dc4a7513257e27f5f21d50f277fc9735f4826c8.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># se ordena los datos por tiempo</span>
+<span class="n">data1</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data_sorted</span> <span class="o">=</span> <span class="n">data1</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;date_time&#39;</span><span class="p">)</span>
+
+<span class="c1"># Por ejemplo: correlación temporal entre Hs y P</span>
+<span class="n">serie_1</span> <span class="o">=</span> <span class="n">data_sorted</span><span class="p">[</span><span class="s1">&#39;Hs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ffill&#39;</span><span class="p">)</span>
+<span class="n">serie_2</span> <span class="o">=</span> <span class="n">data_sorted</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ffill&#39;</span><span class="p">)</span>
+
+<span class="c1"># Calcular la función de correlación cruzada</span>
+<span class="n">correlation</span> <span class="o">=</span> <span class="n">ccf</span><span class="p">(</span><span class="n">serie_1</span><span class="p">,</span> <span class="n">serie_2</span><span class="p">,</span> <span class="n">adjusted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Graficar los desfases (lags)</span>
+<span class="n">lags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">correlation</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="n">correlation</span><span class="p">,</span> <span class="n">basefmt</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Correlación Cruzada entre Hs y P&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Desfase (lags)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Correlación&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_8952\2873907451.py:6: FutureWarning: Series.fillna with &#39;method&#39; is deprecated and will raise in a future version. Use obj.ffill() or obj.bfill() instead.
+  serie_1 = data_sorted[&#39;Hs&#39;].fillna(method=&#39;ffill&#39;)
+C:\Users\luis_\AppData\Local\Temp\ipykernel_8952\2873907451.py:7: FutureWarning: Series.fillna with &#39;method&#39; is deprecated and will raise in a future version. Use obj.ffill() or obj.bfill() instead.
+  serie_2 = data_sorted[&#39;P&#39;].fillna(method=&#39;ffill&#39;)
+</pre></div>
+</div>
+<img alt="_images/5ca808b66cfc0cb07ccaaa3d53a56990f3192e6bbd78c3bdfb4e15d0fa99bd24.png" src="_images/5ca808b66cfc0cb07ccaaa3d53a56990f3192e6bbd78c3bdfb4e15d0fa99bd24.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suponiendo que ya hiciste el promedio por localización</span>
+<span class="n">promedios</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">])[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="c1"># Crear GeoDataFrame para los promedios</span>
+<span class="n">gdf_promedios</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">promedios</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">promedios</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">promedios</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]))</span>
+
+<span class="c1"># Matriz de pesos</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">libpysal</span><span class="w"> </span><span class="kn">import</span> <span class="n">weights</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf_promedios</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Calcular Moran&#39;s I</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">esda.moran</span><span class="w"> </span><span class="kn">import</span> <span class="n">Moran</span>
+<span class="n">moran</span> <span class="o">=</span> <span class="n">Moran</span><span class="p">(</span><span class="n">gdf_promedios</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Moran&#39;s I: </span><span class="si">{</span><span class="n">moran</span><span class="o">.</span><span class="n">I</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, p-value: </span><span class="si">{</span><span class="n">moran</span><span class="o">.</span><span class="n">p_sim</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Moran&#39;s I: 0.4215, p-value: 0.0010
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\miniconda3\envs\ml_venv\lib\site-packages\libpysal\weights\weights.py:224: UserWarning: The weights matrix is not fully connected: 
+ There are 44 disconnected components.
+  warnings.warn(message)
+</pre></div>
+</div>
 </div>
 </div>
 </section>
@@ -1368,7 +1442,7 @@ Critical Values: {&#39;10%&#39;: 0.347, &#39;5%&#39;: 0.463, &#39;2.5%&#39;: 0.5
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x22a1cb93550&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x2014e389070&gt;]
 </pre></div>
 </div>
 <img alt="_images/cc564f053366b00b9f206baa0b73a588982d673e36d181c1f4673f2fcf0946c8.png" src="_images/cc564f053366b00b9f206baa0b73a588982d673e36d181c1f4673f2fcf0946c8.png" />
@@ -1412,7 +1486,7 @@ p-value: 0.1
 Critical Values: {&#39;10%&#39;: 0.347, &#39;5%&#39;: 0.463, &#39;2.5%&#39;: 0.574, &#39;1%&#39;: 0.739}
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_15736\403408010.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_8952\403408010.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
 look-up table. The actual p-value is greater than the p-value returned.
 
   kpss_result = kpss(first_order_diff.iloc[1:], regression=&#39;c&#39;, nlags=&quot;auto&quot;)
@@ -1569,7 +1643,7 @@ Critical Values: {&#39;10%&#39;: 0.347, &#39;5%&#39;: 0.463, &#39;2.5%&#39;: 0.5
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x22a1c7d8b20&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x2015134d190&gt;]
 </pre></div>
 </div>
 <img alt="_images/d4388d06f631aae0ebc61b75e13027174cd31aa35c4bcd9a80bd758bd0eaa1ce.png" src="_images/d4388d06f631aae0ebc61b75e13027174cd31aa35c4bcd9a80bd758bd0eaa1ce.png" />
@@ -1613,7 +1687,7 @@ p-value: 0.1
 Critical Values: {&#39;10%&#39;: 0.347, &#39;5%&#39;: 0.463, &#39;2.5%&#39;: 0.574, &#39;1%&#39;: 0.739}
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_15736\403408010.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_8952\403408010.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
 look-up table. The actual p-value is greater than the p-value returned.
 
   kpss_result = kpss(first_order_diff.iloc[1:], regression=&#39;c&#39;, nlags=&quot;auto&quot;)
@@ -1770,7 +1844,7 @@ Critical Values: {&#39;10%&#39;: 0.347, &#39;5%&#39;: 0.463, &#39;2.5%&#39;: 0.5
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x22a1cd66fa0&gt;]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D at 0x20154199d90&gt;]
 </pre></div>
 </div>
 <img alt="_images/39bebbf582b7c32681874558b574cf210696b76799a6dc8cdc25f22656bfbef1.png" src="_images/39bebbf582b7c32681874558b574cf210696b76799a6dc8cdc25f22656bfbef1.png" />
@@ -1814,7 +1888,7 @@ p-value: 0.1
 Critical Values: {&#39;10%&#39;: 0.347, &#39;5%&#39;: 0.463, &#39;2.5%&#39;: 0.574, &#39;1%&#39;: 0.739}
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_15736\403408010.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_8952\403408010.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
 look-up table. The actual p-value is greater than the p-value returned.
 
   kpss_result = kpss(first_order_diff.iloc[1:], regression=&#39;c&#39;, nlags=&quot;auto&quot;)
@@ -2021,7 +2095,7 @@ p-value: 0.1
 Critical Values: {&#39;10%&#39;: 0.347, &#39;5%&#39;: 0.463, &#39;2.5%&#39;: 0.574, &#39;1%&#39;: 0.739}
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_15736\150963581.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_8952\150963581.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
 look-up table. The actual p-value is greater than the p-value returned.
 
   kpss_result = kpss(data[&#39;uo&#39;], regression=&#39;c&#39;, nlags=&quot;auto&quot;)
@@ -2066,7 +2140,7 @@ p-value: 0.1
 Critical Values: {&#39;10%&#39;: 0.347, &#39;5%&#39;: 0.463, &#39;2.5%&#39;: 0.574, &#39;1%&#39;: 0.739}
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_15736\2564468217.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\luis_\AppData\Local\Temp\ipykernel_8952\2564468217.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
 look-up table. The actual p-value is greater than the p-value returned.
 
   kpss_result = kpss(data[&#39;vo&#39;], regression=&#39;c&#39;, nlags=&quot;auto&quot;)
@@ -2145,7 +2219,7 @@ look-up table. The actual p-value is greater than the p-value returned.
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">65</span><span class="p">],</span> <span class="n">line</span> <span class="mi">16</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">67</span><span class="p">],</span> <span class="n">line</span> <span class="mi">16</span>
 <span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="n">folium</span><span class="o">.</span><span class="n">CircleMarker</span><span class="p">(</span>
 <span class="g g-Whitespace">      </span><span class="mi">7</span>         <span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]],</span>
 <span class="g g-Whitespace">      </span><span class="mi">8</span>         <span class="n">radius</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
@@ -2233,88 +2307,12 @@ look-up table. The actual p-value is greater than the p-value returned.
 <span class="g g-Whitespace">   </span><span class="mi">1104</span> <span class="bp">cls</span> <span class="o">=</span> <span class="n">template_class</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_class</span>
 <span class="ne">-&gt; </span><span class="mi">1105</span> <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="n">gs</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\environment.py:760,</span> in <span class="ni">Environment.compile</span><span class="nt">(self, source, name, filename, raw, defer_init)</span>
-<span class="g g-Whitespace">    </span><span class="mi">758</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">759</span>     <span class="n">source_hint</span> <span class="o">=</span> <span class="n">source</span>
-<span class="ne">--&gt; </span><span class="mi">760</span>     <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">761</span> <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">defer_init</span><span class="o">=</span><span class="n">defer_init</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">762</span> <span class="k">if</span> <span class="n">raw</span><span class="p">:</span>
-
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\environment.py:617,</span> in <span class="ni">Environment._parse</span><span class="nt">(self, source, name, filename)</span>
-<span class="g g-Whitespace">    </span><span class="mi">613</span> <span class="k">def</span><span class="w"> </span><span class="nf">_parse</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">614</span>     <span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">filename</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">615</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Template</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">616</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Internal parsing function used by `parse` and `compile`.&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">617</span>     <span class="k">return</span> <span class="n">Parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
-
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\parser.py:60,</span> in <span class="ni">Parser.__init__</span><span class="nt">(self, environment, source, name, filename, state)</span>
-<span class="g g-Whitespace">     </span><span class="mi">51</span> <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-<span class="g g-Whitespace">     </span><span class="mi">52</span>     <span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">53</span>     <span class="n">environment</span><span class="p">:</span> <span class="s2">&quot;Environment&quot;</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">57</span>     <span class="n">state</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">58</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span>     <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">environment</span>
-<span class="ne">---&gt; </span><span class="mi">60</span>     <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">_tokenize</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span>     <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-<span class="g g-Whitespace">     </span><span class="mi">62</span>     <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
-
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\environment.py:667,</span> in <span class="ni">Environment._tokenize</span><span class="nt">(self, source, name, filename, state)</span>
-<span class="g g-Whitespace">    </span><span class="mi">663</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Called by the parser to do the preprocessing and filtering</span>
-<span class="g g-Whitespace">    </span><span class="mi">664</span><span class="sd"> for all the extensions.  Returns a :class:`~jinja2.lexer.TokenStream`.</span>
-<span class="g g-Whitespace">    </span><span class="mi">665</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">666</span> <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">667</span> <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lexer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">669</span> <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_extensions</span><span class="p">():</span>
-<span class="g g-Whitespace">    </span><span class="mi">670</span>     <span class="n">stream</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">filter_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\lexer.py:611,</span> in <span class="ni">Lexer.tokenize</span><span class="nt">(self, source, name, filename, state)</span>
-<span class="g g-Whitespace">    </span><span class="mi">609</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Calls tokeniter + tokenize and wraps it in a token stream.&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">610</span> <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokeniter</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">611</span> <span class="k">return</span> <span class="n">TokenStream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\lexer.py:335,</span> in <span class="ni">TokenStream.__init__</span><span class="nt">(self, generator, name, filename)</span>
-<span class="g g-Whitespace">    </span><span class="mi">333</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="g g-Whitespace">    </span><span class="mi">334</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="n">Token</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">TOKEN_INITIAL</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">335</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\lexer.py:389,</span> in <span class="ni">TokenStream.__next__</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">387</span> <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">TOKEN_EOF</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">388</span>     <span class="k">try</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">389</span>         <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iter</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">390</span>     <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">391</span>         <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\lexer.py:622,</span> in <span class="ni">Lexer.wrap</span><span class="nt">(self, stream, name, filename)</span>
-<span class="g g-Whitespace">    </span><span class="mi">613</span> <span class="k">def</span><span class="w"> </span><span class="nf">wrap</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">614</span>     <span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">615</span>     <span class="n">stream</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
-<span class="g g-Whitespace">    </span><span class="mi">616</span>     <span class="n">name</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">617</span>     <span class="n">filename</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">618</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterator</span><span class="p">[</span><span class="n">Token</span><span class="p">]:</span>
-<span class="g g-Whitespace">    </span><span class="mi">619</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;This is called with the stream as returned by `tokenize` and wraps</span>
-<span class="g g-Whitespace">    </span><span class="mi">620</span><span class="sd">     every token in a :class:`Token` and converts the value.</span>
-<span class="g g-Whitespace">    </span><span class="mi">621</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">622</span>     <span class="k">for</span> <span class="n">lineno</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">value_str</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">623</span>         <span class="k">if</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">ignored_tokens</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">624</span>             <span class="k">continue</span>
-
-<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\lexer.py:681,</span> in <span class="ni">Lexer.tokeniter</span><span class="nt">(self, source, name, filename, state)</span>
-<span class="g g-Whitespace">    </span><span class="mi">667</span> <span class="k">def</span><span class="w"> </span><span class="nf">tokeniter</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">668</span>     <span class="bp">self</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">669</span>     <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">672</span>     <span class="n">state</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">673</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Iterator</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="g g-Whitespace">    </span><span class="mi">674</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;This method tokenizes the text and returns the tokens in a</span>
-<span class="g g-Whitespace">    </span><span class="mi">675</span><span class="sd">     generator. Use this method if you just want to tokenize a template.</span>
-<span class="g g-Whitespace">    </span><span class="mi">676</span><span class="sd"> </span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">679</span><span class="sd">         breaks.</span>
-<span class="g g-Whitespace">    </span><span class="mi">680</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">681</span>     <span class="n">lines</span> <span class="o">=</span> <span class="n">newline_re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">source</span><span class="p">)[::</span><span class="mi">2</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">683</span>     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_trailing_newline</span> <span class="ow">and</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">684</span>         <span class="k">del</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="nn">File ~\miniconda3\envs\ml_venv\lib\site-packages\jinja2\environment.py:766,</span> in <span class="ni">Environment.compile</span><span class="nt">(self, source, name, filename, raw, defer_init)</span>
+<span class="g g-Whitespace">    </span><span class="mi">764</span>     <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">765</span>         <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;&lt;template&gt;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">766</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compile</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">767</span> <span class="k">except</span> <span class="n">TemplateSyntaxError</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">768</span>     <span class="bp">self</span><span class="o">.</span><span class="n">handle_exception</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source_hint</span><span class="p">)</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
@@ -2412,6 +2410,15 @@ look-up table. The actual p-value is greater than the p-value returned.
         <p class="prev-next-subtitle">previous</p>
         <p class="prev-next-title">Proyecto de Machine Learning</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="python_Modelos.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Resultados</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
