@@ -30,8 +30,10 @@ nbclient.exceptions.CellTimeoutError: A cell timed out while it was being execut
 The message was: Cell execution timed out.
 Here is a preview of the cell contents:
 -------------------
-['# Mapa interactivo con Folium', 'm = folium.Map(location=[55.0, -3.0], zoom_start=6)', '', '# Agregar puntos al mapa interactivo', 'for _, row in data.iterrows():']
-...
-['    ).add_to(m)', '', '# Guardar mapa interactivo en un archivo HTML', 'm.save("mapa_interactivo.html")', 'print("Mapa interactivo guardado como \'mapa_interactivo.html\'")']
+# Realizar GridSearchCV para encontrar los mejores hiperparámetros de KNN
+knn_gs = GridSearchCV(knn_pipeline, knn_param_grid, cv=5)
+start_fit = time.time()
+knn_gs.fit(X_train, Y_train)   
+end_fit = time.time()
 -------------------
 
