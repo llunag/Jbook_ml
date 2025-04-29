@@ -1,4 +1,4 @@
-# Proyecto de Machine Learning
+# Parcial Práctico - Machine Learning
 
 ```{tableofcontents}
 ```
